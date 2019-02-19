@@ -23,24 +23,6 @@ class KnnClassifier:
             dataSet[:,i] = dataSet[:,i] / self.sd[i]
         return dataSet
 
-    def predictBestKHyperparameter(self, nearestNeighbors, predictedLabels):
-        #  nearestNeighbors[nearestNeighbors[:,0]==0][:,[1,2]]
-        # nearestNeighbors[np.ix_(nearestNeighbors[:, 0] > 3, (0, 1))]
-        # nearestNeighbors[nearestNeighbors[:, 0] > 3][:, np.array([False, True])]
-        nearestNeighbors.sort(key=lambda x: x[1])
-        kNearestNeighbors = np.array(nearestNeighbors[:self.k]).astype(int)
-        pp(kNearestNeighbors[:, 2])
-        pp((Counter(kNearestNeighbors[:, 2]).most_common(1)[0][0]))
-        label = (Counter(kNearestNeighbors[:, 2]).most_common(1))[0][0]
-        mapper = Counter(kNearestNeighbors[:, 2])
-        for i in knn.labels:
-            if (mapper.get(i) == None):
-                print(0, end=",")
-            else:
-                print(mapper.get(i), end=",")
-        print(label)
-        predictedLabels.append(label)
-        return predictedLabels
 
     def printKNearestNeighbors(self, nearestNeighbors, predictedLabels):
         nearestNeighbors.sort(key=lambda x: x[0])
