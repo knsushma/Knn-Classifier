@@ -28,7 +28,8 @@ class HyperParamKnn:
         testDataIndecies = np.unique((nearestNeighbors[:,0]).astype(int))
         testSetLabels = self.metadata[:, -1]
 
-        accuracy = []
+        accuracy = 0.0
+        bestK = 1
         for k in range(1,self.k+1):
             predictedLabels = []
             neighbors = nearestNeighbors.copy()
@@ -42,11 +43,22 @@ class HyperParamKnn:
             for index, label in enumerate(predictedLabels):
                 if (label == testSetLabels[index]):
                     count += 1
-            accuracy.append([k,(count/noOfTestDataSet * 100)])
-        npAccuracy = np.array(accuracy)
-        temp = npAccuracy[npAccuracy[:, 1].argsort()]
-        temp = temp[temp[:,1]==npAccuracy.max(axis=0)[1]]
-        bestK = temp[0][0]
+            curAccuracy = count/noOfTestDataSet * 100
+            if (curAccuracy > accuracy):
+                accuracy = curAccuracy
+            elif (curAccuracy == accuracy):
+                bestK = k-1
+                break
+            else:
+                bestK = k
+                break
+
+        pp(bestK)
+        #     accuracy.append([k,(count/noOfTestDataSet * 100)])
+        # npAccuracy = np.array(accuracy)
+        # temp = npAccuracy[npAccuracy[:, 1].argsort()]
+        # temp = temp[temp[:,1]==npAccuracy.max(axis=0)[1]]
+        # bestK = temp[0][0]
         return bestK
 
 
