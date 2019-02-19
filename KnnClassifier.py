@@ -52,7 +52,7 @@ class KnnClassifier:
 if __name__ == '__main__':
 
     knn = KnnClassifier(10, "./Resources/digits_train.json")
-    testKnn = KnnClassifier(3, "./Resources/digits_test.json")
+    testKnn = KnnClassifier(10, "./Resources/digits_test.json")
 
     digitsTrainingSet = json.load(open(knn.inputFile))
     knn.features = np.array(digitsTrainingSet["metadata"]["features"])
