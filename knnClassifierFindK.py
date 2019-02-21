@@ -141,3 +141,68 @@ if __name__ == '__main__':
             nearestNeighbors.append([testIndex, (np.abs(stdTrainSet[trainIndex,0:-1]-stdTestSet[testIndex,0:-1])).sum(), stdTrainSet[trainIndex,-1]])
     bestK = validateKnn.predictBestKHyperparameter(np.array(nearestNeighbors), noOfTestDataSet)
     pp("Best K : {}".format(bestK))
+
+
+
+    # pp(predictions)
+    # ind = np.argpartition(sortedMatrix, knn.k, axis=1)[:, :knn.k]
+    # pp(sortedMatrix[:,0:knn.k])
+    # # predictions = stdTrainSet[ind, 2].mean(1)
+    #
+    # pp(predictions)
+    # pp("############## Time: {}".format(time.time()))
+    # predictedLabels = []
+    # for testIndex in range(0, noOfTestDataSet):
+    #     for trainIndex in range(0, noOfTrainDataSet):
+    #         nearestNeighbors.append([testIndex, (np.abs(stdTrainSet[trainIndex,0:-1]-stdTestSet[testIndex,0:-1])).sum(), stdTrainSet[trainIndex,-1]])
+    #         # nearestNeighbors.append([(np.abs(stdTrainSet[trainIndex,0:-1]-stdTestSet[testIndex,0:-1])).sum(), stdTrainSet[trainIndex,-1]])
+    #         # nearestNeighbors = np.vstack([nearestNeighbors, [testIndex, (np.abs(stdTrainSet[trainIndex,0:-1]-stdTestSet[testIndex,0:-1])).sum(), stdTrainSet[trainIndex,-1]]])
+
+    # pp(np.array(nearestNeighbors).shape)
+    # pp("############## Time: {}".format(time.time()))
+    #
+    # print(type(nearestNeighbors))
+    # nearestNeighbors = np.array(nearestNeighbors)
+    # print(nearestNeighbors[0])
+    # pp(nearestNeighbors[0:1124,:].shape)
+
+
+
+    # for k in range(1, knn.k + 1):
+    #     kNearestNeighbors = (temp[:k]).astype(int)
+    #     label = (Counter(kNearestNeighbors[:, 1]).most_common(1))[0][0]
+    #     predictedLabels.append(label)
+    #     count = 0
+    #     for index, label in enumerate(predictedLabels):
+    #         if (label == valSetLabels[index]):
+    #             count += 1
+    #     print(k, end=",")
+    #     pp(count/noOfTestDataSet)
+    #     accuracy.append([k,count/noOfTestDataSet])
+    #
+    # npAccuracy = np.array(accuracy)
+    # temp = npAccuracy[npAccuracy[:, 1].argsort()]
+    # temp = temp[temp[:, 1] == npAccuracy.max(axis=0)[1]]
+    # bestK = temp[0][0]
+    # pp(bestK)
+    # pp(npAccuracy.max(axis=0)[1])
+    # # bestK = validateKnn.predictBestKHyperparameter(np.array(nearestNeighbors), noOfTestDataSet)
+    # # pp(bestK)
+
+    # pp("############## Time: {}".format(time.time()))
+    # def euclidean_distance(X_train, X_test):
+    #     return [np.linalg.norm(X - X_test) for X in X_train]
+    #
+    #
+    # def k_nearest(X, Y, k):
+    #     idx = np.argpartition(X, k)
+    #     return np.take(Y, idx[:k])
+    #
+    #
+    # def predict(X_test):
+    #     distance_list = [euclidean_distance(stdTrainSet, X) for X in X_test]
+    #     return np.array([Counter(k_nearest(distances, stdTrainSet, 3)).most_common()[0][0] for distances in distance_list])
+    #
+    # result = predict(stdTestSet)
+    # pp("############## Tine: {}".format(time.time()))
+

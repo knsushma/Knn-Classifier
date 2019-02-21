@@ -74,7 +74,7 @@ class HyperParamKnn:
 
 if __name__ == '__main__':
 
-    k = 10
+    k = 20
     # knn = HyperParamKnn(k, "./Resources/digits_train.json")
     # validateKnn = HyperParamKnn(k, "./Resources/digits_val.json")
     # testKnn = HyperParamKnn(k, "./Resources/digits_test.json")
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     validateKnn = HyperParamKnn(k, "./Resources/votes_val.json")
     testKnn = HyperParamKnn(k, "./Resources/votes_test.json")
 
-    args = -2
+    args = 9
 
     digitsTrainingSet = json.load(open(knn.inputFile))
     knn.features = np.array(digitsTrainingSet["metadata"]["features"])
@@ -305,7 +305,7 @@ if __name__ == '__main__':
         count = np.sum(flatResult == np.array(testKnn.labels))
         res = count.item() / noOfTestDataSet
         pp(res)
-    else:
+    elif(args == 3):
         digitsTestSet = json.load(open(testKnn.inputFile))
         testKnn.features = np.array(digitsTestSet["metadata"]["features"])
         testKnn.metadata = np.array(digitsTestSet["data"])
@@ -336,72 +336,65 @@ if __name__ == '__main__':
             res = count.item() / noOfTestDataSet
             print(sliceSize, end=",")
             pp(res)
+    else:
+        digitsTestSet = json.load(open(testKnn.inputFile))
+        testKnn.features = np.array(digitsTestSet["metadata"]["features"])
+        testKnn.metadata = np.array(digitsTestSet["data"])
+        testKnn.labels = testKnn.metadata[:, -1]
+        noOfTestDataSet = testKnn.metadata.shape[0]
 
+        category = testKnn.features[-1][1]
+        if (len(category) != 2):
+            print("ROC can be drawn only on caterogical dataset, please check youe dataset and label types")
+            exit(1)
+        else:
+            labelMap = {}
+            labelMap[category[0]] = 1
+            labelMap[category[1]] = 0
 
+            trainigLabels = knn.metadata[:,-1].copy()
+            for index,label in enumerate(trainigLabels):
+                trainigLabels[index,] = labelMap.get(label)
+            trainigLabels = trainigLabels.astype(int)
 
+            testLabels = testKnn.metadata[:, -1].copy()
+            for index, label in enumerate(testLabels):
+                testLabels[index,] = labelMap.get(label)
+            testLabels = testLabels.astype(int)
 
+            constant = math.pow(10,-5)
 
+            distanceMatrix = np.count_nonzero(testKnn.metadata[:, None, 0:-1] != knn.metadata[None, :, 0:-1], -1)
 
-    # pp(predictions)
-    # ind = np.argpartition(sortedMatrix, knn.k, axis=1)[:, :knn.k]
-    # pp(sortedMatrix[:,0:knn.k])
-    # # predictions = stdTrainSet[ind, 2].mean(1)
-    #
-    # pp(predictions)
-    # pp("############## Time: {}".format(time.time()))
-    # predictedLabels = []
-    # for testIndex in range(0, noOfTestDataSet):
-    #     for trainIndex in range(0, noOfTrainDataSet):
-    #         nearestNeighbors.append([testIndex, (np.abs(stdTrainSet[trainIndex,0:-1]-stdTestSet[testIndex,0:-1])).sum(), stdTrainSet[trainIndex,-1]])
-    #         # nearestNeighbors.append([(np.abs(stdTrainSet[trainIndex,0:-1]-stdTestSet[testIndex,0:-1])).sum(), stdTrainSet[trainIndex,-1]])
-    #         # nearestNeighbors = np.vstack([nearestNeighbors, [testIndex, (np.abs(stdTrainSet[trainIndex,0:-1]-stdTestSet[testIndex,0:-1])).sum(), stdTrainSet[trainIndex,-1]]])
+            ind = np.argsort(distanceMatrix, axis=1, kind='stablesort')[:, :k]
+            predictedLabels = knn.metadata[ind, -1]
+            predictedLabels = (predictedLabels==category[0])*1
 
-    # pp(np.array(nearestNeighbors).shape)
-    # pp("############## Time: {}".format(time.time()))
-    #
-    # print(type(nearestNeighbors))
-    # nearestNeighbors = np.array(nearestNeighbors)
-    # print(nearestNeighbors[0])
-    # pp(nearestNeighbors[0:1124,:].shape)
+            distanceMatrix = np.sort(distanceMatrix, axis=1)[:,:k]
+            weightedDistance = 1 / (np.square(distanceMatrix) + constant)
+            weightedSum = np.sum(weightedDistance, axis=1)
+            confidence = np.sum(weightedDistance * predictedLabels,axis=1)/weightedSum
+            rocMatrix = np.column_stack((testLabels,confidence))
+            rocMatrixSorted = rocMatrix[np.argsort([rocMatrix[:, 1]])][0]
+            posNegCount = Counter(rocMatrixSorted[:,0].astype(int))
+            posCount = posNegCount.get(1)
+            negCount = posNegCount.get(0)
 
-
-
-    # for k in range(1, knn.k + 1):
-    #     kNearestNeighbors = (temp[:k]).astype(int)
-    #     label = (Counter(kNearestNeighbors[:, 1]).most_common(1))[0][0]
-    #     predictedLabels.append(label)
-    #     count = 0
-    #     for index, label in enumerate(predictedLabels):
-    #         if (label == valSetLabels[index]):
-    #             count += 1
-    #     print(k, end=",")
-    #     pp(count/noOfTestDataSet)
-    #     accuracy.append([k,count/noOfTestDataSet])
-    #
-    # npAccuracy = np.array(accuracy)
-    # temp = npAccuracy[npAccuracy[:, 1].argsort()]
-    # temp = temp[temp[:, 1] == npAccuracy.max(axis=0)[1]]
-    # bestK = temp[0][0]
-    # pp(bestK)
-    # pp(npAccuracy.max(axis=0)[1])
-    # # bestK = validateKnn.predictBestKHyperparameter(np.array(nearestNeighbors), noOfTestDataSet)
-    # # pp(bestK)
-
-    # pp("############## Time: {}".format(time.time()))
-    # def euclidean_distance(X_train, X_test):
-    #     return [np.linalg.norm(X - X_test) for X in X_train]
-    #
-    #
-    # def k_nearest(X, Y, k):
-    #     idx = np.argpartition(X, k)
-    #     return np.take(Y, idx[:k])
-    #
-    #
-    # def predict(X_test):
-    #     distance_list = [euclidean_distance(stdTrainSet, X) for X in X_test]
-    #     return np.array([Counter(k_nearest(distances, stdTrainSet, 3)).most_common()[0][0] for distances in distance_list])
-    #
-    # result = predict(stdTestSet)
-    # pp("############## Tine: {}".format(time.time()))
-
-
+            TP = 0
+            FP = 0
+            last_TP = 0
+            for i in range(testKnn.metadata.shape[0]):
+                if (i > 0) and (rocMatrixSorted[i,1] != rocMatrixSorted[i-1,1]) and ( testLabels[i] < 1) and ( TP > last_TP):
+                    FPR = FP / negCount
+                    TPR = TP / posCount
+                    print(FPR, end=",")
+                    print(TPR)
+                    last_TP = TP
+                if testLabels[i] > 0:
+                    TP += 1
+                else:
+                    FP += 1
+            FPR = FP / negCount
+            TPR = TP / posCount
+            print(FPR, end=",")
+            print(TPR)
