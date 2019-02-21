@@ -49,7 +49,6 @@ class HyperParamKnn:
 
         manhattanDistMatrix = np.zeros((dataSetObj.shape[0],len(manhattanIndices)))
         if(len(manhattanIndices)):
-            #pp("Inside First IF")
             trainMatrix = self.metadata[:,manhattanIndices]
             testMatrix = dataSetObj.metadata[:,manhattanIndices]
             self.computeMeanAndSD(trainMatrix[0:self.sliceSize])
@@ -59,31 +58,29 @@ class HyperParamKnn:
 
         hammingDistMatrix = np.zeros((dataSetObj.shape[0], len(hammingIndices)))
         if(len(hammingIndices)):
-            #pp("Inside Second IF")
             trainMatrix = self.metadata[:, hammingIndices]
             testMatrix = dataSetObj.metadata[:, hammingIndices]
             hammingDistMatrix = np.count_nonzero(testMatrix[:, None, :] != trainMatrix[None, 0:self.sliceSize, :], -1)
 
         if(len(manhattanIndices) and len(hammingIndices)):
-            return np.concatenate((manhattanDistMatrix, hammingDistMatrix))
+            return manhattanDistMatrix+hammingDistMatrix
         elif(len(manhattanIndices)):
             return manhattanDistMatrix
         else:
-            #pp("Inside else")
             return hammingDistMatrix
 
 if __name__ == '__main__':
 
     k = 10
-    # knn = HyperParamKnn(k, "./Resources/digits_train.json")
-    # validateKnn = HyperParamKnn(k, "./Resources/digits_val.json")
-    # testKnn = HyperParamKnn(k, "./Resources/digits_test.json")
+    knn = HyperParamKnn(k, "./Resources/digits_train.json")
+    validateKnn = HyperParamKnn(k, "./Resources/digits_val.json")
+    testKnn = HyperParamKnn(k, "./Resources/digits_test.json")
 
-    knn = HyperParamKnn(k, "./Resources/votes_train.json")
-    validateKnn = HyperParamKnn(k, "./Resources/votes_val.json")
-    testKnn = HyperParamKnn(k, "./Resources/votes_test.json")
+    # knn = HyperParamKnn(k, "./Resources/votes_train.json")
+    # validateKnn = HyperParamKnn(k, "./Resources/votes_val.json")
+    # testKnn = HyperParamKnn(k, "./Resources/votes_test.json")
 
-    args = 3
+    args = 1
 
     knn.loadAndInitDataSet(knn.inputFile)
 
@@ -180,7 +177,8 @@ if __name__ == '__main__':
 
             constant = math.pow(10,-5)
 
-            distanceMatrix = np.count_nonzero(testKnn.metadata[:, None, 0:-1] != knn.metadata[None, :, 0:-1], -1)
+            # distanceMatrix = np.count_nonzero(testKnn.metadata[:, None, 0:-1] != knn.metadata[None, :, 0:-1], -1)
+            distanceMatrix = knn.findDistanceMatrix(testKnn)
 
             ind = np.argsort(distanceMatrix, axis=1, kind='stablesort')[:, :k]
             predictedLabels = knn.metadata[ind, -1]
