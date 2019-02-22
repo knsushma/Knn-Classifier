@@ -4,9 +4,7 @@ import math
 import numpy as np
 from numpy import *
 from collections import Counter
-import time
 from scipy.stats import mode
-import pandas as pd
 
 
 
@@ -71,16 +69,16 @@ class HyperParamKnn:
 
 if __name__ == '__main__':
 
-    k = 10
-    knn = HyperParamKnn(k, "./Resources/digits_train.json")
-    validateKnn = HyperParamKnn(k, "./Resources/digits_val.json")
-    testKnn = HyperParamKnn(k, "./Resources/digits_test.json")
+    k = 30
+    # knn = HyperParamKnn(k, "./Resources/digits_train.json")
+    # validateKnn = HyperParamKnn(k, "./Resources/digits_val.json")
+    # testKnn = HyperParamKnn(k, "./Resources/digits_test.json")
 
-    # knn = HyperParamKnn(k, "./Resources/votes_train.json")
-    # validateKnn = HyperParamKnn(k, "./Resources/votes_val.json")
-    # testKnn = HyperParamKnn(k, "./Resources/votes_test.json")
+    knn = HyperParamKnn(k, "./Resources/votes_train.json")
+    validateKnn = HyperParamKnn(k, "./Resources/votes_val.json")
+    testKnn = HyperParamKnn(k, "./Resources/votes_test.json")
 
-    args = 1
+    args = 5
 
     knn.loadAndInitDataSet(knn.inputFile)
 
@@ -155,7 +153,6 @@ if __name__ == '__main__':
             print(accuracy)
     else:
         testKnn.loadAndInitDataSet(testKnn.inputFile)
-
         category = testKnn.features[-1][1]
         if (len(category) != 2):
             print("ROC can be drawn only on caterogical dataset, please check youe dataset and label types")
@@ -165,31 +162,25 @@ if __name__ == '__main__':
             labelMap[category[0]] = 1
             labelMap[category[1]] = 0
 
-            trainigLabels = knn.metadata[:,-1].copy()
-            for index,label in enumerate(trainigLabels):
-                trainigLabels[index,] = labelMap.get(label)
-            trainigLabels = trainigLabels.astype(int)
-
             testLabels = testKnn.metadata[:, -1].copy()
             for index, label in enumerate(testLabels):
                 testLabels[index,] = labelMap.get(label)
             testLabels = testLabels.astype(int)
 
-            constant = math.pow(10,-5)
+            constant = float(math.pow(10,-5))
 
-            # distanceMatrix = np.count_nonzero(testKnn.metadata[:, None, 0:-1] != knn.metadata[None, :, 0:-1], -1)
             distanceMatrix = knn.findDistanceMatrix(testKnn)
-
+            kDistanceMatrix = np.sort(distanceMatrix, axis=1)[:, :k]
             ind = np.argsort(distanceMatrix, axis=1, kind='stablesort')[:, :k]
             predictedLabels = knn.metadata[ind, -1]
             predictedLabels = (predictedLabels==category[0])*1
 
-            distanceMatrix = np.sort(distanceMatrix, axis=1)[:,:k]
-            weightedDistance = 1 / (np.square(distanceMatrix) + constant)
+            weightedDistance = (1 / ((np.square(kDistanceMatrix)) + constant))
             weightedSum = np.sum(weightedDistance, axis=1)
+
             confidence = np.sum(weightedDistance * predictedLabels,axis=1)/weightedSum
             rocMatrix = np.column_stack((testLabels,confidence))
-            rocMatrixSorted = rocMatrix[np.argsort([rocMatrix[:, 1]])][0]
+            rocMatrixSorted = rocMatrix[np.argsort([-rocMatrix[:, 1]])][0]
             posNegCount = Counter(rocMatrixSorted[:,0].astype(int))
             posCount = posNegCount.get(1)
             negCount = posNegCount.get(0)
@@ -198,13 +189,13 @@ if __name__ == '__main__':
             FP = 0
             last_TP = 0
             for i in range(testKnn.shape[0]):
-                if (i > 0) and (rocMatrixSorted[i,1] != rocMatrixSorted[i-1,1]) and ( testLabels[i] < 1) and ( TP > last_TP):
+                if (i > 1) and (rocMatrixSorted[i,1] != rocMatrixSorted[i-1,1]) and ( testLabels[i] == 0) and ( TP > last_TP):
                     FPR = FP / negCount
                     TPR = TP / posCount
                     print(FPR, end=",")
                     print(TPR)
                     last_TP = TP
-                if testLabels[i] > 0:
+                if testLabels[i] == 1:
                     TP += 1
                 else:
                     FP += 1
