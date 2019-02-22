@@ -1,7 +1,7 @@
 import json
 import numpy as np
-from scipy.stats import mode
 import sys
+from collections import Counter
 
 
 class knnClassifier:
@@ -85,8 +85,12 @@ if __name__ == '__main__':
         ind = np.argsort(distanceMatrix, axis=1, kind='stablesort')[:, :k]
         predictions = knn.metadata[ind, -1]
         predictions = np.sort(predictions, axis=1)
-        flatResult = np.array(mode(predictions, axis=1)[0]).flatten()
-        count = np.sum(flatResult == np.array(testKnn.labels))
+        # flatResult = np.array(stats.mode(predictions, axis=1)[0]).flatten()
+        repeats = []
+        for i in range(predictions.shape[0]):
+            repeats.append(Counter(predictions[i]).most_common(1)[0][0])
+        predictedLabels = np.array(repeats).flatten()
+        count = np.sum(predictedLabels == np.array(testKnn.labels))
         accuracy = count.item() / testKnn.shape[0]
         print(knn.sliceSize,end=",")
         print(accuracy)

@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from scipy.stats import mode
+from collections import Counter
 import sys
 
 
@@ -83,9 +83,12 @@ if __name__ == '__main__':
         ind = np.argsort(distanceMatrix, axis=1, kind='stablesort')[:, :kValue]
         predictions = knn.metadata[ind, -1]
         predictions  = np.sort(predictions, axis=1)
-        predictedLabels = np.array(mode(predictions, axis=1)[0])
-        flatPredictedLabels = np.array(mode(predictions, axis=1)[0]).flatten()
-        count = np.sum(flatPredictedLabels == np.array(validateKnn.labels))
+        #predictedLabels = np.array(mode(predictions, axis=1)[0]).flatten()
+        repeats = []
+        for i in range(predictions.shape[0]):
+            repeats.append(Counter(predictions[i]).most_common(1)[0][0])
+        predictedLabels = np.array(repeats)
+        count = np.sum(predictedLabels == np.array(validateKnn.labels))
         accuracy = count.item() / validateKnn.shape[0]
         print(kValue, end=",")
         print(accuracy)
@@ -106,7 +109,11 @@ if __name__ == '__main__':
     ind = np.argsort(distanceMatrix, axis=1, kind='stablesort')[:, :bestK]
     predictions = knn.metadata[ind, -1]
     predictions = np.sort(predictions, axis=1)
-    flatResult = np.array(mode(predictions, axis=1)[0]).flatten()
+    # flatResult = np.array(mode(predictions, axis=1)[0]).flatten()
+    repeats = []
+    for i in range(predictions.shape[0]):
+        repeats.append(Counter(predictions[i]).most_common(1)[0][0])
+    flatResult = np.array(repeats).flatten()
     count = np.sum(flatResult == np.array(testKnn.labels))
     accuracy = count.item() / testKnn.shape[0]
     print(accuracy)

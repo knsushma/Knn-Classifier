@@ -1,7 +1,6 @@
 import json
 import numpy as np
 from collections import Counter
-from scipy.stats import mode
 import sys
 
 
@@ -81,7 +80,11 @@ if __name__ == '__main__':
     ind = np.argsort(distanceMatrix, axis=1, kind='stablesort')[:, :k]
     predictions = knn.metadata[ind, -1]
     predictions = np.sort(predictions, axis=1)
-    predictedLabels = np.array(mode(predictions, axis=1)[0])
+    #predictedLabels = np.array(mode(predictions, axis=1)[0])
+    repeats = []
+    for i in range(predictions.shape[0]):
+        repeats.append(Counter(predictions[i]).most_common(1)[0])
+    predictedLabels = np.array(repeats)
     for index in range(predictions.shape[0]):
         mapper = Counter(predictions[index].tolist())
         for i in knn.labelTypes:
