@@ -67,7 +67,7 @@ class knnClassifier:
 if __name__ == '__main__':
 
     if (len(sys.argv)<3):
-        print("Please pass 4 arguments. 1) K value to compute KNN, 2) Traning File path, 3) Testing File Path")
+        print("Please pass 3 arguments. 1) K value to compute KNN, 2) Traning File path, 3) Testing File Path")
         sys.exit(1)
 
     k = int(sys.argv[1])
