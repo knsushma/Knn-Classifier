@@ -1,8 +1,6 @@
-from pprint import pprint as pp
 import json
 import math
 import numpy as np
-from numpy import *
 from collections import Counter
 from scipy.stats import mode
 
@@ -121,6 +119,7 @@ if __name__ == '__main__':
         npAccuracy = np.array(accuracyList)
         temp = npAccuracy[npAccuracy[:, 1].argsort()]
         temp = temp[temp[:, 1] == npAccuracy.max(axis=0)[1]]
+        temp = temp[temp[:, 0].argsort()]
         bestK = int(temp[0][0])
         print(bestK)
 
