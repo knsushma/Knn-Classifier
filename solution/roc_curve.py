@@ -66,14 +66,13 @@ class knnClassifier:
 
 if __name__ == '__main__':
 
-    if (len(sys.argv)<4):
-        print("Please pass 4 arguments. 1) K value to compute KNN, 2) Traning File path, 3) Validation File path, 4) Testing File Path")
+    if (len(sys.argv)<3):
+        print("Please pass 4 arguments. 1) K value to compute KNN, 2) Traning File path, 3) Testing File Path")
         sys.exit(1)
 
     k = int(sys.argv[1])
     knn = knnClassifier(k, sys.argv[2])
-    validateKnn = knnClassifier(k, sys.argv[3])
-    testKnn = knnClassifier(k, sys.argv[4])
+    testKnn = knnClassifier(k, sys.argv[3])
 
     knn.loadAndInitDataSet(knn.inputFile)
     testKnn.loadAndInitDataSet(testKnn.inputFile)
