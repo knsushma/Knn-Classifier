@@ -88,5 +88,5 @@ if __name__ == '__main__':
         flatResult = np.array(mode(predictions, axis=1)[0]).flatten()
         count = np.sum(flatResult == np.array(testKnn.labels))
         accuracy = count.item() / testKnn.shape[0]
-        print(knn.sliceSize, end=",")
+        print(knn.sliceSize,end=",")
         print(accuracy)
