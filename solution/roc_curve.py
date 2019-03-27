@@ -4,7 +4,6 @@ import numpy as np
 from collections import Counter
 import sys
 
-
 class knnClassifier:
     def __init__(self, k , inputFilePath):
         self.k = k
@@ -104,17 +103,19 @@ if __name__ == '__main__':
         confidence = np.sum(weightedDistance * predictedLabels,axis=1)/weightedSum
         rocMatrix = np.column_stack((testLabels,confidence))
         rocMatrixSorted = rocMatrix[np.argsort([-rocMatrix[:, 1]])][0]
+        print(rocMatrixSorted[:, -1].tolist())
         posNegCount = Counter(rocMatrixSorted[:,0].astype(int))
         posCount = posNegCount.get(1)
         negCount = posNegCount.get(0)
+        #negCount = predictedLabels.shape[0]
 
         TP = 0
         FP = 0
         last_TP = 0
         for i in range(testKnn.shape[0]):
             if (i > 1) and (rocMatrixSorted[i,1] != rocMatrixSorted[i-1,1]) and ( testLabels[i] == 0) and ( TP > last_TP):
-                FPR = FP / negCount
-                TPR = TP / posCount
+                FPR = FP * 1.0 / negCount
+                TPR = TP * 1.0 / posCount
                 print(FPR, end=",")
                 print(TPR)
                 last_TP = TP
@@ -122,7 +123,7 @@ if __name__ == '__main__':
                 TP += 1
             else:
                 FP += 1
-        FPR = FP / negCount
-        TPR = TP / posCount
+        FPR = FP * 1.0 / negCount
+        TPR = TP * 1.0 / posCount
         print(FPR, end=",")
         print(TPR)
