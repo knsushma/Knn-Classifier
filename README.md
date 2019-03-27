@@ -1,4 +1,15 @@
-# Knn-Classifier
+## Knn-Classifier
+The goals are to implement learning method which includs:
+
+1. Using a validation set for model selection,
+2. Characterizing predictive accuracy as a function of training set size using a learning curve, and
+3. Characterizing tradeoffs between false positive and true positive rates using an ROC curve.
+
+
+### Environment Setup:
+```
+Follow steps mentioned in python-setup-on-remote/python-setup.pdf
+```
 
 To find KNN
 ```
